@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">To Do List</string>
+    <string name="title">"TO DO LIST APP!"</string>
+    <string name="main_subtitle">Add your Lists</string>
+    <string name="sub_subtitle">Add your to do items</string>
+    <string name="add">ADD</string>
+    <string name="main_hint">Think of a topic..</string>
+    <string name="sub_hint">What I need to do..</string>
+</resources>
