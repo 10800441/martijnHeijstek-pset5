@@ -46,9 +46,19 @@ public class MainListActivity extends AppCompatActivity {
             SharedPreferences.Editor initialEditor = prefs.edit();
             initialEditor.putInt("counter", 0);
             initialEditor.apply();
-        } else {
-            counter = prefs.getInt("counter", 0);
         }
+        // Retrieve previous lists
+
+
+
+//        for (int i = 0; i < numberOfTitles; i++) {
+  //          String tableName = pref.getString(String.valueOf(i), "");
+    //    subLists = manager.getPreviousLists(counter);
+
+
+
+
+
         updateAdapter();
     }
 
@@ -86,15 +96,14 @@ public class MainListActivity extends AppCompatActivity {
 
     // Add a new item to the listView
     public void add(View view) {
-        String todo_string = mainEditText.getText().toString();
-        if (todo_string.length() != 0) {
-            ToDoList item = new ToDoList(todo_string, new ArrayList<ToDoItem>());
-
+        String todoListTitle= mainEditText.getText().toString();
+        if (todoListTitle.length() != 0) {
             counter ++;
+            ToDoList item = new ToDoList(counter, todoListTitle, new ArrayList<ToDoItem>());
             subLists.add(item);
             SharedPreferences.Editor prefEditor = prefs.edit();
 
-            prefEditor.putString(String.valueOf(counter), todo_string);
+            prefEditor.putString(String.valueOf(counter), todoListTitle);
             prefEditor.putInt("counter", counter);
             prefEditor.apply();
 
@@ -117,7 +126,9 @@ public class MainListActivity extends AppCompatActivity {
         // Change the ToDoItem
         alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                adapter.remove(adapter.getItem(pos));updateAdapter();
+                adapter.remove(adapter.getItem(pos));
+               //TODO delete the whole database with name "toDolListTitle"
+
                 updateAdapter();
             }
         });

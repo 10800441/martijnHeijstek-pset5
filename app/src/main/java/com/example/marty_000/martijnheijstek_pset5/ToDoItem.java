@@ -27,10 +27,6 @@ public class ToDoItem {
         return this.checked;
     }
 
-    public ToDoItem(int listNumber, String text){
-            this.listNumber = listNumber;
-            this.text = text;
-    }
 
         public ToDoItem changeCheckedState(){
             checked = !checked;

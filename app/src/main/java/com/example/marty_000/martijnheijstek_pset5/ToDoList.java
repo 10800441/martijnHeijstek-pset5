@@ -7,10 +7,12 @@ import java.util.ArrayList;
  */
 
 public class ToDoList {
+    int ID;
     private String title;
     private ArrayList<ToDoItem> items = new ArrayList<>();
 
-    public ToDoList(String title, ArrayList<ToDoItem> items) {
+    public ToDoList(int ID, String title, ArrayList<ToDoItem> items) {
+        this.ID = ID;
         this.title = title;
         this.items = items;
     }
