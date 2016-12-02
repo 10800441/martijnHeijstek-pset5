@@ -1,5 +1,6 @@
 package com.example.marty_000.martijnheijstek_pset5;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +11,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by marty_000 on 28-11-2016.
+/* Many Lists (To Do List app 2.0)
+ * Martijn Heijstek, 10800441
+ * 02-12-2016
+ *
+ * Adapter to give the To Do Items in the listview a checkbox
+ * used in SubListActivity
  */
-
-
 
     public class SubListAdapter extends ArrayAdapter<ToDoItem> {
 
@@ -26,7 +29,7 @@ import java.util.ArrayList;
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            View view = inflater.inflate(R.layout.sub_list_item, parent, false);
+            @SuppressLint("ViewHolder") View view = inflater.inflate(R.layout.sub_list_item, parent, false);
 
             ToDoItem toDo = getItem(position);
 
