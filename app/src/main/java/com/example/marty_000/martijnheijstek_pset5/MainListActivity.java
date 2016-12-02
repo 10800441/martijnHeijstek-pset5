@@ -1,5 +1,12 @@
 package com.example.marty_000.martijnheijstek_pset5;
 
+/* Many Lists (To Do List app 2.0)
+ * Martijn Heijstek, 10800441
+ * 02-12-2016
+ *
+ * This class handles interactions between the user and the ToDoManager.
+ * This class operates on a list of ToDoLists.
+ */
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +29,6 @@ import java.util.Set;
 public class MainListActivity extends AppCompatActivity {
 
     private DBHelper helper;
-    private ListView mainListView;
     private EditText mainEditText;
     private SharedPreferences prefs;
     private ArrayAdapter<String> adapter;
@@ -37,7 +43,7 @@ public class MainListActivity extends AppCompatActivity {
 
         context = getApplicationContext();
         mainEditText = (EditText) findViewById(R.id.editText);
-        mainListView = (ListView) findViewById(R.id.toDoListView);
+        ListView mainListView = (ListView) findViewById(R.id.toDoListView);
 
         prefs = getApplicationContext().getSharedPreferences("listNames", MODE_PRIVATE);
         manager =  ToDoManager.getInstance(prefs);
@@ -91,7 +97,7 @@ public class MainListActivity extends AppCompatActivity {
                 subLists.add(listName);
                 manager.updatePrefs(subLists);
                 mainEditText.getText().clear();
-                adapter.notifyDataSetChanged(); 
+                adapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(context, "Your List name must be unique!", Toast.LENGTH_SHORT).show();
             }

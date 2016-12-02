@@ -1,5 +1,16 @@
 package com.example.marty_000.martijnheijstek_pset5;
 
+/* Many Lists (To Do List app 2.0)
+ * Martijn Heijstek, 10800441
+ * 02-12-2016
+ *
+ * This class handles all interactions with the SQLite database
+ * It is used in the subListActivity.
+ * This class is also present in the To Do List app 1.0 but now it is
+ * improved with an extra boolean.
+ */
+
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -43,7 +54,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(todoString, item.text);
-values.put(checked, item.checked);
+        values.put(checked, item.checked);
         db.insert(DB_TABLE, null, values);
         db.close();
     }

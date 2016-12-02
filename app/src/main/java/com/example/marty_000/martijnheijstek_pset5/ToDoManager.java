@@ -1,7 +1,14 @@
 package com.example.marty_000.martijnheijstek_pset5;
 
-import android.content.SharedPreferences;
+/* Many Lists (To Do List app 2.0)
+ * Martijn Heijstek, 10800441
+ * 02-12-2016
+ *
+ * This class makes a singleton that is used to access different databases.
+ * This class also contains operations on the List of database names used in MainListActivity
+ */
 
+import android.content.SharedPreferences;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +42,8 @@ public class ToDoManager {
         edit.putStringSet("ListTitleSet", listTitleSet);
         edit.apply();
     }
+
+    // removes a value from the list and memory
     public ArrayList<String> removeListName(int index, ArrayList<String> subLists) {
         subLists.remove(index);
         updatePrefs(subLists);

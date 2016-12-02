@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
             TextView text = (TextView) view.findViewById(R.id.listViewTV);
             text.setText(toDo.text);
-            checkBox.setChecked(toDo.checkChecked());
+            checkBox.setChecked(toDo.checked);
            return view;
         }
     }

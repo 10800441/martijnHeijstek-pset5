@@ -1,5 +1,12 @@
 package com.example.marty_000.martijnheijstek_pset5;
 
+/* Many Lists (To Do List app 2.0)
+ * Martijn Heijstek, 10800441
+ * 02-12-2016
+ *
+ * This class handles all interactions between a user and one To Do List.
+ */
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,25 +26,27 @@ import java.util.ArrayList;
 
 public class SubListActivity extends AppCompatActivity {
     private DBHelper helper;
-    private ListView listView;
     private EditText editText;
     private SharedPreferences prefs;
     private ArrayAdapter<ToDoItem> adapter;
     private ArrayList<ToDoItem> toDoList;
     private Context context;
-    private String subListName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_list);
 
+        String subListName;
         Intent intent = getIntent();
         subListName = intent.getExtras().getString("subListName");
+
+        // Retrieve the helper that belongs to a specific To Do List
+        helper = new DBHelper(this, subListName);
+
         context = getApplicationContext();
         editText = (EditText) findViewById(R.id.editText);
-        listView = (ListView) findViewById(R.id.toDoListView);
-        helper = new DBHelper(this, subListName);
+        ListView listView = (ListView) findViewById(R.id.toDoListView);
         toDoList = new ArrayList<>();
 
         TextView title = (TextView) findViewById(R.id.titleText);
@@ -67,7 +76,7 @@ public class SubListActivity extends AppCompatActivity {
             adapter = new SubListAdapter(this, toDoList);
             listView.setAdapter(adapter);
 
-            // Long press to delete an item
+            // Long press to delete or edit an item
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
@@ -75,7 +84,7 @@ public class SubListActivity extends AppCompatActivity {
 
                     if (editableItem != null) {
                         // Send the user an alert dialog
-                        popUp(editableItem.id_number, editableItem.text, pos, editableItem.checkChecked());
+                        popUp(editableItem.id_number, editableItem.text, pos, editableItem.checked);
                         updateAdapter();
 
                     } else {
@@ -88,8 +97,7 @@ public class SubListActivity extends AppCompatActivity {
                 }
             });
 
-            // Tap to edit an item
-
+            // Tap to check/uncheck an item
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
@@ -154,12 +162,14 @@ public class SubListActivity extends AppCompatActivity {
             }
         });
 
+        // remove the item
         alert.setNeutralButton("Delete item", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 helper.delete(adapter.getItem(pos));
                 updateAdapter();
             }
         });
+
         // Cancel popUp
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -168,6 +178,7 @@ public class SubListActivity extends AppCompatActivity {
         });
         alert.show();
     }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(getApplication(), MainListActivity.class);
