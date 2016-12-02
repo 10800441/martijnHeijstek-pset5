@@ -9,13 +9,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainListActivity extends AppCompatActivity {
 
@@ -23,11 +25,10 @@ public class MainListActivity extends AppCompatActivity {
     private ListView mainListView;
     private EditText mainEditText;
     private SharedPreferences prefs;
-    private ArrayAdapter<ToDoList> adapter;
+    private ArrayAdapter<String> adapter;
     private Context context;
-    ArrayList<ToDoList> subLists= new ArrayList<>();
+    ArrayList<String> subLists= new ArrayList<>();
     ToDoManager manager;
-    int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,34 +38,19 @@ public class MainListActivity extends AppCompatActivity {
         context = getApplicationContext();
         mainEditText = (EditText) findViewById(R.id.editText);
         mainListView = (ListView) findViewById(R.id.toDoListView);
-        manager =  ToDoManager.getInstance();
+
+        prefs = getApplicationContext().getSharedPreferences("listNames", MODE_PRIVATE);
+        manager =  ToDoManager.getInstance(prefs);
 
         // Load example List
-        prefs = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-
-        if(!prefs.contains("counter")) {
-            SharedPreferences.Editor initialEditor = prefs.edit();
-            initialEditor.putInt("counter", 0);
-            initialEditor.apply();
+        if(!prefs.contains("ListTitleSet")) {
+            SharedPreferences.Editor editor= prefs.edit();
+            Set<String> ListTitleSet = new HashSet<>();
+            editor.putStringSet("ListTitleSet", ListTitleSet);
+            editor.apply();
         }
-        // Retrieve previous lists
 
-
-
-//        for (int i = 0; i < numberOfTitles; i++) {
-  //          String tableName = pref.getString(String.valueOf(i), "");
-    //    subLists = manager.getPreviousLists(counter);
-
-
-
-
-
-        updateAdapter();
-    }
-
-    // This function will update the listview
-    private void updateAdapter() {
-        subLists = manager.getLists();
+        subLists = manager.getListNames();
 
         // Standard adapter
         adapter = new ArrayAdapter<>(this,
@@ -75,8 +61,8 @@ public class MainListActivity extends AppCompatActivity {
         mainListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-                popUp(pos);
-                updateAdapter();
+                popUp(pos, adapter.getItem(pos));
+                adapter.notifyDataSetChanged();
                 return true;
             }
         });
@@ -85,41 +71,40 @@ public class MainListActivity extends AppCompatActivity {
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-                ToDoList editableItem = adapter.getItem(pos);
+                String editableItem = adapter.getItem(pos);
                 Intent intent = new Intent(getApplication(), SubListActivity.class);
-                intent.putExtra("subListName", editableItem.toString());
+                intent.putExtra("subListName", editableItem);
                 startActivity(intent);
                 finish();
             }
         });
+
     }
+
+
 
     // Add a new item to the listView
     public void add(View view) {
-        String todoListTitle= mainEditText.getText().toString();
-        if (todoListTitle.length() != 0) {
-            counter ++;
-            ToDoList item = new ToDoList(counter, todoListTitle, new ArrayList<ToDoItem>());
-            subLists.add(item);
-            SharedPreferences.Editor prefEditor = prefs.edit();
-
-            prefEditor.putString(String.valueOf(counter), todoListTitle);
-            prefEditor.putInt("counter", counter);
-            prefEditor.apply();
-
-            mainEditText.getText().clear();
-            updateAdapter();
+        String listName = mainEditText.getText().toString();
+        if (listName.length() != 0) {
+            if (!subLists.contains(listName)) {
+                subLists.add(listName);
+                manager.updatePrefs(subLists);
+                mainEditText.getText().clear();
+                adapter.notifyDataSetChanged(); 
+            } else {
+                Toast.makeText(context, "Your List name must be unique!", Toast.LENGTH_SHORT).show();
+            }
 
         } else {
             Toast.makeText(context, "Please enter text!", Toast.LENGTH_SHORT).show();
         }
     }
-
     // Pop up screen that gives the user the ability to change an item
-    public void popUp(final int pos) {
+    public void popUp(final int pos, final String dBname) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        String title = adapter.getItem(pos).toString();
+        String title = adapter.getItem(pos);
         alert.setTitle("Warning");
         alert.setMessage("Are you sure you want to delete the entire list '" + title + "'?");
 
@@ -127,9 +112,10 @@ public class MainListActivity extends AppCompatActivity {
         alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 adapter.remove(adapter.getItem(pos));
-               //TODO delete the whole database with name "toDolListTitle"
+                deleteDatabase(dBname);
+                subLists = manager.removeListName(pos, manager.getListNames());
+                adapter.notifyDataSetChanged();
 
-                updateAdapter();
             }
         });
 
@@ -140,5 +126,21 @@ public class MainListActivity extends AppCompatActivity {
             }
         });
         alert.show();
+    }
+
+
+
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        TextView title = (TextView) findViewById(R.id.titleText);
+        title.setText(R.string.app_name);
+
+        TextView subTitle = (TextView) findViewById(R.id.subTitle);
+        subTitle.setText(R.string.sub_subtitle);
+
+        mainEditText.setHint(R.string.main_hint);
     }
 }

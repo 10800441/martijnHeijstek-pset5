@@ -11,10 +11,13 @@ public class ToDoList {
     private String title;
     private ArrayList<ToDoItem> items = new ArrayList<>();
 
-    public ToDoList(int ID, String title, ArrayList<ToDoItem> items) {
-        this.ID = ID;
+    public ToDoList(String title, ArrayList<ToDoItem> items) {
         this.title = title;
         this.items = items;
+    }
+
+    public ToDoList(String title) {
+        this.title = title;
     }
 
     @Override

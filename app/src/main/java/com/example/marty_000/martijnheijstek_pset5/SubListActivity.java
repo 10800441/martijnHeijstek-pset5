@@ -30,7 +30,7 @@ public class SubListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sub_list);
+        setContentView(R.layout.activity_main_list);
 
         Intent intent = getIntent();
         subListName = intent.getExtras().getString("subListName");
@@ -38,9 +38,15 @@ public class SubListActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText);
         listView = (ListView) findViewById(R.id.toDoListView);
         helper = new DBHelper(this, subListName);
+        toDoList = new ArrayList<>();
 
         TextView title = (TextView) findViewById(R.id.titleText);
         title.setText(subListName);
+
+        TextView subTitle = (TextView) findViewById(R.id.subTitle);
+        subTitle.setText(R.string.sub_subtitle);
+
+        editText.setHint(R.string.sub_hint);
 
         // Load three toDoItems on first initialization
         prefs = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
@@ -54,14 +60,10 @@ public class SubListActivity extends AppCompatActivity {
             editor.putString("toDoList", "toDoList");
             editor.apply();
         }
-        updateAdapter();
-    }
 
-    // This function will update the listview
-        private void updateAdapter(){
-            toDoList = helper.read();
+        toDoList.addAll(helper.read());
 
-            // Standard adapter
+        // Standard adapter
             adapter = new SubListAdapter(this, toDoList);
             listView.setAdapter(adapter);
 
@@ -81,23 +83,30 @@ public class SubListActivity extends AppCompatActivity {
                         updateAdapter();
                     }
 
-                    adapter.notifyDataSetChanged();
+                    updateAdapter();
                     return true;
                 }
             });
 
-        // Tap to edit an item
+            // Tap to edit an item
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-                ToDoItem editableItem = adapter.getItem(pos);
-                editableItem.changeCheckedState();
-                helper.update(editableItem);
-                updateAdapter();
-            }
-        });
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                    ToDoItem editableItem = adapter.getItem(pos);
+                    editableItem.changeCheckedState();
+                    helper.update(editableItem);
+                    updateAdapter();
+                }
+            });
     }
+
+    // This function will update the listview
+        private void updateAdapter() {
+            adapter.clear();
+            toDoList.addAll(helper.read());
+            adapter.notifyDataSetChanged();
+        }
 
     // Add a new item to the listView
     public void add(View view) {
